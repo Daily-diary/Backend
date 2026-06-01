@@ -1,10 +1,10 @@
-package com.webapp3.congestion;
+package com.likelion.daily_diary;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CongestionApplicationTests {
+class DailyDiaryApplicationTests {
 
 	@Test
 	void contextLoads() {
