@@ -32,7 +32,7 @@ public record FeedResponseDto(
                         .toList(),
                 diary.getCreatedAt(),
                 diary.getUser().getId(),
-                diary.getUser().getUsername(),
+                diary.getUser().getNickname(),
                 diary.getUser().getProfileImageUrl()
         );
     }
