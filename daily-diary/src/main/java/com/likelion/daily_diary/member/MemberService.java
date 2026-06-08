@@ -3,6 +3,9 @@ package com.likelion.daily_diary.member;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.likelion.daily_diary.friendship.FriendshipRepository;
+import com.likelion.daily_diary.member.dto.MemberSearchResponse;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +16,12 @@ public class MemberService {
     private static final int MAX_NICKNAME_LENGTH = 30;
 
     private final MemberRepository memberRepository;
+    private final FriendshipRepository friendshipRepository;
     private final FirebaseAuth firebaseAuth;
 
-    public MemberService(MemberRepository memberRepository, FirebaseAuth firebaseAuth) {
+    public MemberService(MemberRepository memberRepository, FriendshipRepository friendshipRepository, FirebaseAuth firebaseAuth) {
         this.memberRepository = memberRepository;
+        this.friendshipRepository = friendshipRepository;
         this.firebaseAuth = firebaseAuth;
     }
 
@@ -39,6 +44,23 @@ public class MemberService {
         Member currentMember = getActiveMember(member.getId());
         currentMember.updateProfileImage(normalizeOptionalUrl(profileImageUrl));
         return currentMember;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemberSearchResponse> searchMembers(Member me, String query) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        List<Member> results = memberRepository.searchByNicknameOrEmail(query.trim(), me.getId());
+        return results.stream().map(target -> {
+            String status = friendshipRepository.findBetween(me, target)
+                    .map(f -> switch (f.getStatus()) {
+                        case ACCEPTED -> "FRIEND";
+                        case PENDING -> f.getRequester().getId().equals(me.getId()) ? "SENT" : "RECEIVED";
+                    })
+                    .orElse("NONE");
+            return MemberSearchResponse.of(target, status);
+        }).toList();
     }
 
     @Transactional
