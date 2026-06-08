@@ -23,8 +23,7 @@ public class FeedService {
     private final UserRepository userRepository;
     private final FriendshipRepository friendshipRepository;
 
-    public List<FeedResponseDto> getFeed(String firebaseUid) {
-        User me = findUser(firebaseUid);
+    public List<FeedResponseDto> getFeed(User me) {
         List<User> friends = getAcceptedFriends(me);
         if (friends.isEmpty()) return List.of();
         return diaryRepository.findFeedByUsers(friends)
@@ -33,8 +32,7 @@ public class FeedService {
                 .toList();
     }
 
-    public List<FeedResponseDto> getFriendFeed(String firebaseUid, UUID userId) {
-        User me = findUser(firebaseUid);
+    public List<FeedResponseDto> getFriendFeed(User me, UUID userId) {
         User friend = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         if (!friendshipRepository.areFriends(me, friend)) {
@@ -46,19 +44,13 @@ public class FeedService {
                 .toList();
     }
 
-    public FeedResponseDto getFeedDetail(String firebaseUid, UUID diaryId) {
-        User me = findUser(firebaseUid);
+    public FeedResponseDto getFeedDetail(User me, UUID diaryId) {
         Diary diary = diaryRepository.findPublicById(diaryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 비공개 일기입니다."));
         if (!friendshipRepository.areFriends(me, diary.getUser())) {
             throw new IllegalArgumentException("친구의 일기만 볼 수 있습니다.");
         }
         return FeedResponseDto.from(diary);
-    }
-
-    private User findUser(String firebaseUid) {
-        return userRepository.findByFirebaseUid(firebaseUid)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
 
     private List<User> getAcceptedFriends(User user) {
