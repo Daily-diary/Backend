@@ -29,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
         User me = userRepository.findByFirebaseUid("test-uid-123").orElseGet(() ->
                 userRepository.save(User.builder()
                         .firebaseUid("test-uid-123")
-                        .username("테스트유저")
+                        .nickname("테스트유저")
                         .email("test@test.com")
                         .createdAt(LocalDateTime.now())
                         .updatedAt(LocalDateTime.now())
@@ -38,7 +38,7 @@ public class DataInitializer implements CommandLineRunner {
         User friend = userRepository.findByFirebaseUid("test-uid-456").orElseGet(() ->
                 userRepository.save(User.builder()
                         .firebaseUid("test-uid-456")
-                        .username("친구유저")
+                        .nickname("친구유저")
                         .email("friend@test.com")
                         .createdAt(LocalDateTime.now())
                         .updatedAt(LocalDateTime.now())

@@ -38,4 +38,12 @@ public class Friendship {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    public void accept() {
+        this.status = FriendshipStatus.ACCEPTED;
+    }
+
+    public void reject() {
+        this.status = FriendshipStatus.REJECTED;
+    }
 }

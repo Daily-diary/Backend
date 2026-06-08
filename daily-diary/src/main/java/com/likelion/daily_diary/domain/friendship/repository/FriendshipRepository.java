@@ -8,9 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
+
+    @Query("SELECT f FROM Friendship f WHERE (f.requester = :a AND f.receiver = :b) OR (f.requester = :b AND f.receiver = :a)")
+    Optional<Friendship> findBetween(@Param("a") User a, @Param("b") User b);
+
+    List<Friendship> findByReceiverAndStatus(User receiver, FriendshipStatus status);
+
+    List<Friendship> findByRequesterAndStatus(User requester, FriendshipStatus status);
 
     @Query("SELECT f FROM Friendship f WHERE f.status = :status AND (f.requester = :user OR f.receiver = :user)")
     List<Friendship> findByStatusAndUser(@Param("status") FriendshipStatus status, @Param("user") User user);

@@ -1,20 +1,21 @@
-package com.likelion.daily_diary.friendship.dto;
+package com.likelion.daily_diary.domain.friendship.dto;
 
-import com.likelion.daily_diary.friendship.Friendship;
-import com.likelion.daily_diary.member.Member;
+import com.likelion.daily_diary.domain.friendship.entity.Friendship;
+import com.likelion.daily_diary.domain.user.entity.User;
+
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record FriendRequestResponse(
-        Long friendshipId,
-        Long memberId,
+        UUID friendshipId,
+        UUID memberId,
         String nickname,
         String email,
         String profileImageUrl,
         LocalDateTime requestedAt
 ) {
-
     public static FriendRequestResponse fromReceived(Friendship f) {
-        Member requester = f.getRequester();
+        User requester = f.getRequester();
         return new FriendRequestResponse(
                 f.getId(),
                 requester.getId(),
@@ -26,7 +27,7 @@ public record FriendRequestResponse(
     }
 
     public static FriendRequestResponse fromSent(Friendship f) {
-        Member receiver = f.getReceiver();
+        User receiver = f.getReceiver();
         return new FriendRequestResponse(
                 f.getId(),
                 receiver.getId(),

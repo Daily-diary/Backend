@@ -3,14 +3,13 @@ package com.likelion.daily_diary.config;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import com.likelion.daily_diary.member.Member;
-import com.likelion.daily_diary.member.MemberService;
+import com.likelion.daily_diary.domain.user.entity.User;
+import com.likelion.daily_diary.domain.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,18 +17,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.List;
+
 @Component
+@RequiredArgsConstructor
 public class FirebaseAuthFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final FirebaseAuth firebaseAuth;
-    private final MemberService memberService;
-
-    public FirebaseAuthFilter(FirebaseAuth firebaseAuth, MemberService memberService) {
-        this.firebaseAuth = firebaseAuth;
-        this.memberService = memberService;
-    }
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -43,8 +41,8 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
             try {
                 String idToken = authorization.substring(BEARER_PREFIX.length());
                 FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
-                Member member = memberService.findOrCreateByFirebaseToken(decodedToken);
-                SecurityContextHolder.getContext().setAuthentication(new FirebaseAuthentication(member));
+                User user = userService.findOrCreateByFirebaseToken(decodedToken);
+                SecurityContextHolder.getContext().setAuthentication(new FirebaseAuthentication(user));
             } catch (FirebaseAuthException | RuntimeException e) {
                 SecurityContextHolder.clearContext();
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase ID token");
@@ -57,11 +55,11 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
     private static class FirebaseAuthentication extends AbstractAuthenticationToken {
 
-        private final Member member;
+        private final User user;
 
-        FirebaseAuthentication(Member member) {
+        FirebaseAuthentication(User user) {
             super(List.of(new SimpleGrantedAuthority("ROLE_USER")));
-            this.member = member;
+            this.user = user;
             setAuthenticated(true);
         }
 
@@ -72,7 +70,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
         @Override
         public Object getPrincipal() {
-            return member;
+            return user;
         }
     }
 }
