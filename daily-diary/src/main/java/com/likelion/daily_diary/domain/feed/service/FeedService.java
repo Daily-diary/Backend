@@ -1,10 +1,12 @@
 package com.likelion.daily_diary.domain.feed.service;
 
+import com.likelion.daily_diary.domain.comment.repository.DiaryCommentRepository;
 import com.likelion.daily_diary.domain.diary.entity.Diary;
 import com.likelion.daily_diary.domain.diary.repository.DiaryRepository;
 import com.likelion.daily_diary.domain.feed.dto.FeedResponseDto;
 import com.likelion.daily_diary.domain.friendship.entity.FriendshipStatus;
 import com.likelion.daily_diary.domain.friendship.repository.FriendshipRepository;
+import com.likelion.daily_diary.domain.like.repository.DiaryLikeRepository;
 import com.likelion.daily_diary.domain.user.entity.User;
 import com.likelion.daily_diary.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +24,15 @@ public class FeedService {
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
     private final FriendshipRepository friendshipRepository;
+    private final DiaryLikeRepository likeRepository;
+    private final DiaryCommentRepository commentRepository;
 
     public List<FeedResponseDto> getFeed(User me) {
         List<User> friends = getAcceptedFriends(me);
         if (friends.isEmpty()) return List.of();
         return diaryRepository.findFeedByUsers(friends)
                 .stream()
-                .map(FeedResponseDto::from)
+                .map(d -> toDto(d, me))
                 .toList();
     }
 
@@ -40,7 +44,7 @@ public class FeedService {
         }
         return diaryRepository.findPublicByUser(friend)
                 .stream()
-                .map(FeedResponseDto::from)
+                .map(d -> toDto(d, me))
                 .toList();
     }
 
@@ -50,7 +54,14 @@ public class FeedService {
         if (!friendshipRepository.areFriends(me, diary.getUser())) {
             throw new IllegalArgumentException("친구의 일기만 볼 수 있습니다.");
         }
-        return FeedResponseDto.from(diary);
+        return toDto(diary, me);
+    }
+
+    private FeedResponseDto toDto(Diary diary, User me) {
+        long likeCount = likeRepository.countByDiary(diary);
+        boolean liked = likeRepository.existsByUserAndDiary(me, diary);
+        long commentCount = commentRepository.countByDiary(diary);
+        return FeedResponseDto.from(diary, likeCount, liked, commentCount);
     }
 
     private List<User> getAcceptedFriends(User user) {

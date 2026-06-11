@@ -18,9 +18,12 @@ public record FeedResponseDto(
         LocalDateTime createdAt,
         UUID authorId,
         String authorName,
-        String authorProfileImageUrl
+        String authorProfileImageUrl,
+        long likeCount,
+        boolean liked,
+        long commentCount
 ) {
-    public static FeedResponseDto from(Diary diary) {
+    public static FeedResponseDto from(Diary diary, long likeCount, boolean liked, long commentCount) {
         return new FeedResponseDto(
                 diary.getId(),
                 diary.getTitle(),
@@ -33,7 +36,10 @@ public record FeedResponseDto(
                 diary.getCreatedAt(),
                 diary.getUser().getId(),
                 diary.getUser().getNickname(),
-                diary.getUser().getProfileImageUrl()
+                diary.getUser().getProfileImageUrl(),
+                likeCount,
+                liked,
+                commentCount
         );
     }
 }
