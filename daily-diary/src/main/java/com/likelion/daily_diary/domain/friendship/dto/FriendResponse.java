@@ -7,9 +7,8 @@ import java.util.UUID;
 
 public record FriendResponse(
         UUID friendshipId,
-        UUID memberId,
+        UUID userId,
         String nickname,
-        String email,
         String profileImageUrl
 ) {
     public static FriendResponse of(Friendship friendship, UUID myId) {
@@ -20,7 +19,6 @@ public record FriendResponse(
                 friendship.getId(),
                 friend.getId(),
                 friend.getNickname(),
-                friend.getEmail(),
                 friend.getProfileImageUrl()
         );
     }
