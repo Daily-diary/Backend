@@ -27,7 +27,7 @@ public class CommentService {
     public List<CommentResponseDto> getComments(User user, UUID diaryId) {
         Diary diary = diaryRepository.findPublicById(diaryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 비공개 일기입니다."));
-        if (!diary.getUser().equals(user) && !friendshipRepository.areFriends(user, diary.getUser())) {
+        if (!diary.getUser().getId().equals(user.getId()) && !friendshipRepository.areFriends(user, diary.getUser())) {
             throw new IllegalArgumentException("친구의 일기만 볼 수 있습니다.");
         }
         return commentRepository.findByDiaryOrderByCreatedAtAsc(diary)
@@ -43,7 +43,7 @@ public class CommentService {
         }
         Diary diary = diaryRepository.findPublicById(diaryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 비공개 일기입니다."));
-        if (!diary.getUser().equals(user) && !friendshipRepository.areFriends(user, diary.getUser())) {
+        if (!diary.getUser().getId().equals(user.getId()) && !friendshipRepository.areFriends(user, diary.getUser())) {
             throw new IllegalArgumentException("친구의 일기에만 이야기를 남길 수 있습니다.");
         }
         DiaryComment comment = DiaryComment.builder()
@@ -61,7 +61,7 @@ public class CommentService {
         if (!comment.getDiary().getId().equals(diaryId)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
-        if (!comment.getUser().equals(user)) {
+        if (!comment.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("본인의 이야기만 삭제할 수 있습니다.");
         }
         commentRepository.delete(comment);

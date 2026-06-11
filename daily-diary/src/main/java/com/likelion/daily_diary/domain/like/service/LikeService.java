@@ -26,7 +26,7 @@ public class LikeService {
         Diary diary = diaryRepository.findPublicById(diaryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 비공개 일기입니다."));
 
-        if (!diary.getUser().equals(user) && !friendshipRepository.areFriends(user, diary.getUser())) {
+        if (!diary.getUser().getId().equals(user.getId()) && !friendshipRepository.areFriends(user, diary.getUser())) {
             throw new IllegalArgumentException("친구의 일기만 공감할 수 있습니다.");
         }
 

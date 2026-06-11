@@ -51,7 +51,7 @@ public class FeedService {
     public FeedResponseDto getFeedDetail(User me, UUID diaryId) {
         Diary diary = diaryRepository.findPublicById(diaryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 비공개 일기입니다."));
-        if (!friendshipRepository.areFriends(me, diary.getUser())) {
+        if (!diary.getUser().getId().equals(me.getId()) && !friendshipRepository.areFriends(me, diary.getUser())) {
             throw new IllegalArgumentException("친구의 일기만 볼 수 있습니다.");
         }
         return toDto(diary, me);
