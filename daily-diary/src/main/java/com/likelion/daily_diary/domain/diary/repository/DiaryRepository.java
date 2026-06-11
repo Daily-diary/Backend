@@ -13,10 +13,10 @@ import java.util.UUID;
 public interface DiaryRepository extends JpaRepository<Diary, UUID> {
     List<Diary> findByUserOrderByDiaryDateDesc(User user);
 
-    @Query("SELECT d FROM Diary d JOIN FETCH d.user WHERE d.user IN :users AND d.isPublic = true ORDER BY d.diaryDate DESC")
+    @Query("SELECT d FROM Diary d JOIN FETCH d.user WHERE d.user IN :users AND d.isPublic = true ORDER BY d.createdAt DESC")
     List<Diary> findFeedByUsers(@Param("users") List<User> users);
 
-    @Query("SELECT d FROM Diary d JOIN FETCH d.user WHERE d.user = :user AND d.isPublic = true ORDER BY d.diaryDate DESC")
+    @Query("SELECT d FROM Diary d JOIN FETCH d.user WHERE d.user = :user AND d.isPublic = true ORDER BY d.createdAt DESC")
     List<Diary> findPublicByUser(@Param("user") User user);
 
     @Query("SELECT d FROM Diary d JOIN FETCH d.user WHERE d.id = :id AND d.isPublic = true")
