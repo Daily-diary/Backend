@@ -5,9 +5,8 @@ import com.likelion.daily_diary.domain.user.entity.User;
 import java.util.UUID;
 
 public record UserSearchResponse(
-        UUID memberId,
+        UUID id,
         String nickname,
-        String email,
         String profileImageUrl,
         String friendshipStatus
 ) {
@@ -15,7 +14,6 @@ public record UserSearchResponse(
         return new UserSearchResponse(
                 user.getId(),
                 user.getNickname(),
-                user.getEmail(),
                 user.getProfileImageUrl(),
                 status
         );
