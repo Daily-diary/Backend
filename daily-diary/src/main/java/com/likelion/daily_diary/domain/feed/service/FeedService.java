@@ -37,12 +37,12 @@ public class FeedService {
     }
 
     public List<FeedResponseDto> getFriendFeed(User me, UUID userId) {
-        User friend = userRepository.findById(userId)
+        User target = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        if (!friendshipRepository.areFriends(me, friend)) {
+        if (!target.getId().equals(me.getId()) && !friendshipRepository.areFriends(me, target)) {
             throw new IllegalArgumentException("친구 관계가 아닙니다.");
         }
-        return diaryRepository.findPublicByUser(friend)
+        return diaryRepository.findPublicByUser(target)
                 .stream()
                 .map(d -> toDto(d, me))
                 .toList();
@@ -67,7 +67,7 @@ public class FeedService {
     private List<User> getAcceptedFriends(User user) {
         return friendshipRepository.findByStatusAndUser(FriendshipStatus.ACCEPTED, user)
                 .stream()
-                .map(f -> f.getRequester().equals(user) ? f.getReceiver() : f.getRequester())
+                .map(f -> f.getRequester().getId().equals(user.getId()) ? f.getReceiver() : f.getRequester())
                 .toList();
     }
 }
