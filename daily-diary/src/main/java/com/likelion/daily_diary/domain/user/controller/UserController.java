@@ -38,7 +38,7 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestBody ProfileUpdateRequest request
     ) {
-        return UserResponse.from(userService.updateNickname(user.getId(), request.nickname()));
+        return UserResponse.from(userService.updateProfile(user.getId(), request.nickname(), request.bio()));
     }
 
     @PatchMapping("/me/profile-image")

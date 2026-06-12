@@ -33,6 +33,9 @@ public class User {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
+    @Column(length = 100)
+    private String bio;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -51,8 +54,9 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 
-    public void updateNickname(String nickname) {
+    public void updateProfile(String nickname, String bio) {
         this.nickname = nickname;
+        this.bio = bio;
     }
 
     public void updateProfileImage(String profileImageUrl) {

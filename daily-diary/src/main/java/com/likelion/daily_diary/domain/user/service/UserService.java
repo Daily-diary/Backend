@@ -40,9 +40,10 @@ public class UserService {
     }
 
     @Transactional
-    public User updateNickname(UUID userId, String nickname) {
+    public User updateProfile(UUID userId, String nickname, String bio) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        user.updateNickname(normalizeNickname(nickname, user.getEmail()));
+        String normalizedBio = (bio == null || bio.isBlank()) ? null : bio.trim();
+        user.updateProfile(normalizeNickname(nickname, user.getEmail()), normalizedBio);
         return user;
     }
 
